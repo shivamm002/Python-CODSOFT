@@ -7,7 +7,6 @@ class ToDoApp:
         self.root.title("To-Do List")
         self.tasks = []  
 
-        
         heading = tk.Label(root, text="📝 To-Do List", font=("Helvetica", 18, "bold"), fg="#333")
         heading.grid(row=0, column=0, columnspan=2, pady=10)
 
