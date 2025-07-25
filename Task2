@@ -1,5 +1,4 @@
 from tkinter import *
-
 app = Tk()
 app.title("Enhanced Calculator by Saumitra Misra")
 app.config(background="#FF474C")
