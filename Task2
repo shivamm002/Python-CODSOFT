@@ -1,1 +1,137 @@
+from tkinter import *
 
+app = Tk()
+app.title("Enhanced Calculator by Saumitra Misra")
+app.config(background="#FF474C")
+app.resizable(False, False)
+
+
+expression = ""
+operation = ""
+
+def click(num):
+    entry_field.insert(END, str(num))
+
+def add():
+    calculate("add")
+
+def subtract():
+    calculate("subtract")
+
+def multiply():
+    calculate("multiply")
+
+def divide():
+    calculate("divide")
+
+def calculate(op):
+    global expression, operation
+    expression = entry_field.get()
+    operation = op
+    entry_field.delete(0, END)
+    update_history(f"{expression} {op_symbols[op]}")
+
+def equal():
+    global expression, operation
+    try:
+        second = entry_field.get()
+        result = 0
+        first_num = float(expression)
+        second_num = float(second)
+
+        if operation == "add":
+            result = first_num + second_num
+        elif operation == "subtract":
+            result = first_num - second_num
+        elif operation == "multiply":
+            result = first_num * second_num
+        elif operation == "divide":
+            if second_num == 0:
+                entry_field.delete(0, END)
+                entry_field.insert(0, "Error: Div by 0")
+                return
+            result = first_num / second_num
+
+        entry_field.delete(0, END)
+        entry_field.insert(0, int(result) if result.is_integer() else round(result, 5))
+        update_history(f"{expression} {op_symbols[operation]} {second} = {result}")
+    except:
+        entry_field.delete(0, END)
+        entry_field.insert(0, "Error")
+        update_history("Error")
+
+def clear():
+    entry_field.delete(0, END)
+    update_history("")
+
+def backspace():
+    current = entry_field.get()
+    entry_field.delete(0, END)
+    entry_field.insert(0, current[:-1])
+
+def dot():
+    current = entry_field.get()
+    if '.' not in current:
+        entry_field.insert(END, '.')
+
+def update_history(text):
+    history_label.config(text=text)
+
+def keypress(event):
+    key = event.char
+    if key.isdigit():
+        click(key)
+    elif key == '+':
+        add()
+    elif key == '-':
+        subtract()
+    elif key == '*':
+        multiply()
+    elif key == '/':
+        divide()
+    elif key == '.':
+        dot()
+    elif key == '\r':
+        equal()
+    elif key == '\x08':
+        backspace()
+
+op_symbols = {
+    "add": "+",
+    "subtract": "-",
+    "multiply": "×",
+    "divide": "÷"
+}
+
+
+title_label = Label(app, text="Calculator", font=("Arial", 20, "bold"), bg="#FF474C", fg="white")
+title_label.grid(row=0, column=0, columnspan=4, pady=(10, 0))
+
+
+entry_field = Entry(app, width=25, justify="right", font=("Arial", 18), borderwidth=5)
+entry_field.grid(row=1, column=0, columnspan=4, padx=10, pady=10)
+
+history_label = Label(app, text="", bg="#FF474C", fg="white", anchor="e", font=("Arial", 10))
+history_label.grid(row=2, column=0, columnspan=4, sticky="we")
+
+
+buttons = [
+    ('7', lambda: click(7), 3, 0), ('8', lambda: click(8), 3, 1), ('9', lambda: click(9), 3, 2), ('÷', divide, 3, 3),
+    ('4', lambda: click(4), 4, 0), ('5', lambda: click(5), 4, 1), ('6', lambda: click(6), 4, 2), ('×', multiply, 4, 3),
+    ('1', lambda: click(1), 5, 0), ('2', lambda: click(2), 5, 1), ('3', lambda: click(3), 5, 2), ('-', subtract, 5, 3),
+    ('0', lambda: click(0), 6, 0), ('.', dot, 6, 1), ('=', equal, 6, 2), ('+', add, 6, 3),
+    ('C', clear, 7, 0, 2), ('←', backspace, 7, 2, 2)
+]
+
+
+for btn in buttons:
+    text, cmd, row, col = btn[:4]
+    colspan = btn[4] if len(btn) == 5 else 1
+    Button(app, text=text, width=7*colspan+1, height=2, font=("Arial", 12), command=cmd)\
+        .grid(row=row, column=col, columnspan=colspan, pady=2, padx=2)
+
+
+app.bind("<Key>", keypress)
+
+
+app.mainloop()
