@@ -1,1 +1,80 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
 
+class ToDoApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("To-Do List")
+        self.tasks = []  
+
+        
+        heading = tk.Label(root, text="📝 To-Do List", font=("Helvetica", 18, "bold"), fg="#333")
+        heading.grid(row=0, column=0, columnspan=2, pady=10)
+
+        
+        self.task_entry = tk.Entry(root, width=40)
+        self.task_entry.grid(row=1, column=0, padx=10, pady=5)
+
+        
+        add_button = tk.Button(root, text="Add Task", command=self.add_task)
+        add_button.grid(row=1, column=1, padx=5)
+
+        
+        self.listbox = tk.Listbox(root, width=50, height=10)
+        self.listbox.grid(row=2, column=0, columnspan=2, padx=10)
+
+        
+        update_button = tk.Button(root, text="Update Task", command=self.update_task)
+        update_button.grid(row=3, column=0, pady=5)
+
+        
+        done_button = tk.Button(root, text="Mark/Unmark Done", command=self.toggle_done)
+        done_button.grid(row=3, column=1)
+
+        
+        exit_button = tk.Button(root, text="Exit", command=root.quit)
+        exit_button.grid(row=4, column=0, columnspan=2, pady=10)
+
+    def add_task(self):
+        task_text = self.task_entry.get().strip()
+        if task_text:
+            self.tasks.append({"text": task_text, "done": False})
+            self.update_listbox()
+            self.task_entry.delete(0, tk.END)
+        else:
+            messagebox.showwarning("Input Error", "Task cannot be empty.")
+
+    def update_task(self):
+        selected_index = self.listbox.curselection()
+        if not selected_index:
+            messagebox.showwarning("Selection Error", "No task selected.")
+            return
+
+        new_text = simpledialog.askstring("Update Task", "Enter new task text:")
+        if new_text:
+            self.tasks[selected_index[0]]["text"] = new_text.strip()
+            self.update_listbox()
+        else:
+            messagebox.showinfo("Update Cancelled", "No new task entered.")
+
+    def toggle_done(self):
+        selected_index = self.listbox.curselection()
+        if not selected_index:
+            messagebox.showwarning("Selection Error", "No task selected.")
+            return
+
+        task = self.tasks[selected_index[0]]
+        task["done"] = not task["done"]
+        self.update_listbox()
+
+    def update_listbox(self):
+        self.listbox.delete(0, tk.END)
+        for task in self.tasks:
+            status = "✅ Done" if task["done"] else "❌ Not Done"
+            self.listbox.insert(tk.END, f"{task['text']}  [{status}]")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ToDoApp(root)
+    root.mainloop()
